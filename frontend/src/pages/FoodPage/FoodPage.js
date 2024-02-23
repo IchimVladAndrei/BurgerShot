@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
 import classes from "./foodPage.module.css";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getById } from "../../services/foodService";
 import Price from "../../components/Price/Price";
+import { useCart } from "../../hooks/useCart";
+import NotFound from "../../components/NotFound/NotFound";
 export default function FoodPage() {
   const [food, setFood] = useState({});
   const { id } = useParams();
+  const { addToCart } = useCart();
+  const navigate = useNavigate();
+  const handleToCart = () => {
+    addToCart(food);
+    navigate("/cart"); //to force to go to cart
+  };
 
   useEffect(() => {
     getById(id).then(setFood);
@@ -13,7 +21,9 @@ export default function FoodPage() {
 
   return (
     <>
-      {food && (
+      {!food ? (
+        <NotFound />
+      ) : (
         <div className={classes.container}>
           <img
             className={classes.image}
@@ -45,7 +55,7 @@ export default function FoodPage() {
             <div className={classes.price}>
               <Price price={food.price} />
             </div>
-            <button>Add to cart</button>
+            <button onClick={handleToCart}>Add to cart</button>
           </div>
         </div>
       )}
